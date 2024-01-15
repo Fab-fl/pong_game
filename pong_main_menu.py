@@ -41,5 +41,6 @@ def main_menu():
                     pong_local_multiplayer.restart()
                 elif event.key == pygame.K_2:
                     print('starting multiplayer')
+                    call(["python", "pong_localmultiüplayer.py"])
                 
 main_menu()
