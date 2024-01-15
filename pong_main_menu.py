@@ -1,8 +1,7 @@
 import pygame
 from pygame.locals import *
-from subprocess import call
-
-from pong_local_multiplayer import *
+import subprocess
+import sys
 
 pygame.init()
 
@@ -38,9 +37,12 @@ def main_menu():
             elif event.type == KEYDOWN:
                 if event.key == pygame.K_1:
                     print('starting singleplayer')
-                    pong_local_multiplayer.restart()
+                    # Add the code to start your single-player game here
+                    
                 elif event.key == pygame.K_2:
                     print('starting multiplayer')
-                    call(["python", "pong_localmultiüplayer.py"])
-                
-main_menu()
+                    # Start the pong_local_multiplayer.py script using subprocess
+                    subprocess.call([sys.executable, "/pong_local_multiplayer.py"])
+
+if __name__ == "__main__":
+    main_menu()

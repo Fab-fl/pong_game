@@ -9,7 +9,7 @@ pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
-pong_sound = pygame.mixer.Sound("C:/Users/UPraktikant/Desktop/python/slimypong.wav")
+###pong_sound = pygame.mixer.Sound("C:/Users/UPraktikant/Desktop/python/slimypong.wav")
 
 clock = pygame.time.Clock()
 
@@ -157,13 +157,13 @@ while not exit:  ##loops forever until user presses exit
         restart()
 
     if ball.top <= 0 or ball.bottom >= window_height:
-        pygame.mixer.Sound.play(pong_sound)
+        ##pygame.mixer.Sound.play(pong_sound)
         ball_speed_y *= -1
         print("top collision detected")
         print(ball_speed_y)
 
     if pygame.Rect.colliderect(paddle_left, ball) or pygame.Rect.colliderect(paddle_right, ball):
-        pygame.mixer.Sound.play(pong_sound)
+        ##pygame.mixer.Sound.play(pong_sound)
         ball_speed_x *= -1
         print('paddle ball collision detected')
         print(ball_speed_x)
