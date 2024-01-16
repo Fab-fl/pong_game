@@ -9,7 +9,12 @@ pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
-pong_sound = pygame.mixer.Sound("C:/Users/UPraktikant/Desktop/python/slimypong.wav")
+
+timer = 0
+
+ran = 0
+
+pong_sound = pygame.mixer.Sound("C:/Users/UPraktikant/Desktop/pongygame/pong_game-main/slimypong.wav")
 
 clock = pygame.time.Clock()
 
@@ -47,22 +52,29 @@ paddle_right_speed = 0
 ball_speed_x = 0
 ball_speed_y = 0
 
-ran = 0
+ball_multiplier_x = 1
+ball_multiplier_y = 1
+
 ##-------
 
 def restart():
-    
     global ball_speed_x
     global ball_speed_y
     global Font
+
     ball_speed_x = 0
     ball_speed_y = 0
 
     ball.y = (window_height / 2)
     ball.x = (window_width / 2)
 
+ 
+
     ball_speed_x = 6 * random.choice((1,-1))
     ball_speed_y = 6 * random.choice((1,-1))
+
+    ball_multiplier_x = 0
+    ball_multiplier_y = 0
 
     waiting = True
 
@@ -88,6 +100,9 @@ def win(winner):
     global paddle_right_score
     global paddle_left_score 
     global window
+    global ball_multiplier_x
+    global ball_multiplier_y
+    global timer
     print('moved into win function')
     window.fill((0, 0, 0)) 
     win_text = Font.render(str(winner) + " has won the game, press any key to restart", True, gold)
@@ -98,13 +113,16 @@ def win(winner):
     waiting = True
     while waiting:
         for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
+            if event.type == pygame.QUIT:
+                exit = True
                 quit()
             if event.type == pygame.KEYDOWN:
                 window.fill((0, 0, 0)) 
                 paddle_left_score = 0
-                paddle_right_score = 0
+                paddle_right_score = 0 
+
+                timer = 0
+
                 print('reset')
                 restart() 
                 waiting = False
@@ -115,14 +133,7 @@ while not exit:  ##loops forever until user presses exit
         if event.type == pygame.QUIT:
             exit = True
             quit()
-        
         if event.type == pygame.KEYDOWN:  # detect keypresses
-            if event.key == pygame.K_UP:
-                paddle_right_speed = -paddlemove_size
-                print('paddle_right moved:', paddle_right.y)
-            if event.key == pygame.K_DOWN:
-                paddle_right_speed = +paddlemove_size
-                print('paddle_right moved:', paddle_right.y)
 
             if event.key == pygame.K_w:
                 paddle_left_speed = -paddlemove_size
@@ -131,18 +142,13 @@ while not exit:  ##loops forever until user presses exit
                 paddle_left_speed = +paddlemove_size
                 print('paddle_left moved:', paddle_left.y)
 
+
             if event.key == pygame.K_PLUS:
                 game_speed += 10
                 print(game_speed)
 
-
         if event.type == pygame.KEYUP:  # detect keypress ending
-            if event.key == pygame.K_UP:
-                paddle_right_speed = 0
-                print('paddle_right moved:', paddle_right.y)
-            if event.key == pygame.K_DOWN:
-                paddle_right_speed = 0
-                print('paddle_right moved:', paddle_right.y)
+            
 
             if event.key == pygame.K_w:
                 paddle_left_speed = 0
@@ -151,6 +157,13 @@ while not exit:  ##loops forever until user presses exit
                 paddle_left_speed = 0
                 print('paddle_left moved:', paddle_left.y)
 
+
+
+    if ball.y > paddle_right.bottom:
+        paddle_right_speed = +paddlemove_size
+
+    if ball.y < paddle_right.top:
+        paddle_right_speed = -paddlemove_size
     
     paddle_left.y += paddle_left_speed
     paddle_right.y += paddle_right_speed
@@ -168,45 +181,55 @@ while not exit:  ##loops forever until user presses exit
         print(paddle_left_score)
         restart()
 
-    ###old collision detection:
-    """if pygame.Rect.colliderect(paddle_left, ball) or pygame.Rect.colliderect(paddle_right, ball):
-        ##pygame.mixer.Sound.play(pong_sound)
-        ball_speed_x *= -1
-        print('paddle ball collision detected')
-        print(ball_speed_x)"""
-    ###----------------------------------------
+    ###old collision detection system:
 
-    ###--- reworked collision detection system ---
+    """if pygame.Rect.colliderect(paddle_left, ball) or pygame.Rect.colliderect(paddle_right, ball):
+        pygame.mixer.Sound.play(pong_sound)
+        if ball.colliderect(paddle_left) and (ball.y < paddle_left.top or ball.y > paddle_left.bottom):
+            ball_speed_x *= -1
+            ball_speed_y *= -1.5
+            print('Top or bottom collision wit paddle')
+        elif ball.colliderect(paddle_right) and (ball.y < paddle_right.top or ball.y > paddle_right.bottom):
+            ball_speed_x *= -1
+            ball_speed_y *= -1.5
+            print('Top or bottom collision wit paddle')
+        else:
+            ball_speed_x *= -1
+            print('Paddle collision detected')"""
+
+   ###--- reworked collision detection system ---
     
     if ball.top <= 0 or ball.bottom >= window_height:
-        ##pygame.mixer.Sound.play(pong_sound)
+        pygame.mixer.Sound.play(pong_sound)
         ball_speed_y *= -1
-        print("top collision detected")
         print(ball_speed_y)
+    
+    if ball.x <= 20 and ball.y == paddle_left.top:
+        print('top')
+        ball_speed_y *= -1
 
-    if ball.x <= 20 and ball.bottom == paddle_left.top:
-        ##ball_speed_x *= -1
-        ball_speed_y *= -1
     
-    
-    if ball.x <= 20 and ball.top == paddle_left.bottom:
-        ##ball_speed_x *= -1
+    if ball.x <= 20 and ball.y == paddle_left.bottom:
+        print('bottom')
         ball_speed_y *= -1
-        
+
+    
     if ran == 10:
         if ball.left <= paddle_left.right and ball.colliderect(paddle_left) :
+            ballcolor = red
             print('left side of ball collided with right side of left paddle')
             ball_speed_x *= -1
             ran = 0 
 
         if ball.right >= paddle_right.left and ball.colliderect(paddle_right):
+            ballcolor = blue
             print('right side of ball collided with left side of right paddle')
             ball_speed_x *= -1
             ran = 0 
     else:
-        ran += 1    
-    ###------------------------------------------------------
-        
+        ran += 1
+    ###-----------------------------------------------------
+
     if paddle_left.top <= 0: 
         paddle_left.top = 0
     if paddle_left.bottom >= window_height:
@@ -217,7 +240,6 @@ while not exit:  ##loops forever until user presses exit
     if paddle_right.bottom >= window_height:
         paddle_right.bottom = window_height
     
-
     if paddle_right_score >= 5 or paddle_left_score >= 5:
         
         if paddle_right_score > paddle_left_score:
@@ -228,9 +250,15 @@ while not exit:  ##loops forever until user presses exit
             winside = 'Left side'
         win(winside)
 
-    ball.y += (ball_speed_y)
-    ball.x += (ball_speed_x)
-
+    ball.y += (ball_speed_y) * ball_multiplier_y
+    ball.x += (ball_speed_x) * ball_multiplier_x
+    
+    """ timer += 1
+    if timer >= 800:
+        ball_multiplier_x += 0.1
+        ball_multiplier_y += 0.1
+        print('ball speed increased')
+        timer = 0"""
 
     window.fill((0, 0, 0))  # Clear window before drawing
     pygame.draw.rect(window, white, paddle_left)

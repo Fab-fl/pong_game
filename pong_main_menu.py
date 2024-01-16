@@ -8,9 +8,9 @@ pygame.init()
 window_width = 900
 window_height = 500
 window = pygame.display.set_mode((window_width, window_height))
-pygame.display.set_caption("Pong Game - Main Menu")
+pygame.display.set_caption("Fab's Pong Game - Main Menu")
 
-font = pygame.font.SysFont('timesnewroman', 50)
+font = pygame.font.Font('C:/Users/UPraktikant/Desktop/pongygame/pong_game-main/pongfont.otf', 50)
 
 white = (255, 255, 255)
 black = (0, 0, 0)
@@ -37,12 +37,10 @@ def main_menu():
             elif event.type == KEYDOWN:
                 if event.key == pygame.K_1:
                     print('starting singleplayer')
-                    # Add the code to start your single-player game here
-                    
+                    subprocess.call([sys.executable, r"C:\Users\UPraktikant\Desktop\pongygame\pong_game-main\pong_singleplayer.py"])
                 elif event.key == pygame.K_2:
                     print('starting multiplayer')
-                    # Start the pong_local_multiplayer.py script using subprocess
-                    subprocess.call([sys.executable, "/pong_local_multiplayer.py"])
+                    subprocess.call([sys.executable, r"C:\Users\UPraktikant\Desktop\pongygame\pong_game-main\pong_local_multiplayer.py"])
 
-if __name__ == "__main__":
-    main_menu()
+
+main_menu()
