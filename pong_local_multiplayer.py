@@ -3,13 +3,16 @@ import random
 import time
 from pygame import mixer
 from pygame.locals import *
+import os
 
 ###initialisation and Variable declaration
 pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
-pong_sound = pygame.mixer.Sound("C:/Users/UPraktikant/Desktop/python/slimypong.wav")
+script_dir = os.path.dirname(__file__)
+
+pong_sound = pygame.mixer.Sound(os.path.join(script_dir, 'slimypong.wav'))
 
 clock = pygame.time.Clock()
 
@@ -33,7 +36,7 @@ paddle_left_score = 0
 paddle_right_score = 0
 
 Font = pygame.font.SysFont('Timesnewroman', 30)
-
+ScoreFont = pygame.font.Font(os.path.join(script_dir, 'pongfont.otf'), 25)
 
 ball = pygame.Rect(window_width / 2 - 15, window_height / 2, 30, 30)
 paddle_left = pygame.Rect(10, window_height / 2, 10, 100)
@@ -77,8 +80,9 @@ def restart():
                 exit = True
                 waiting = False
             elif event.type == pygame.KEYDOWN:
-                print('restart function wait ended')
-                waiting = False 
+                if event.key != pygame.K_w and event.key != pygame.K_s and event.key != pygame.K_UP and event.key != pygame.K_DOWN:
+                    print('restart function wait ended')
+                    waiting = False
 
 
 restart()
@@ -155,31 +159,10 @@ while not exit:  ##loops forever until user presses exit
     paddle_left.y += paddle_left_speed
     paddle_right.y += paddle_right_speed
 
-        
-    if ball.left <= 0:
-        paddle_right_score += 1
-        print('paddle_right_score :')
-        print(paddle_right_score )
-        restart()
-
-    if ball.right >= window_width:
-        paddle_left_score += 1
-        print('paddle_left_score :')
-        print(paddle_left_score)
-        restart()
-
-    ###old collision detection:
-    """if pygame.Rect.colliderect(paddle_left, ball) or pygame.Rect.colliderect(paddle_right, ball):
-        ##pygame.mixer.Sound.play(pong_sound)
-        ball_speed_x *= -1
-        print('paddle ball collision detected')
-        print(ball_speed_x)"""
-    ###----------------------------------------
-
     ###--- reworked collision detection system ---
     
     if ball.top <= 0 or ball.bottom >= window_height:
-        ##pygame.mixer.Sound.play(pong_sound)
+        pygame.mixer.Sound.play(pong_sound)
         ball_speed_y *= -1
         print("top collision detected")
         print(ball_speed_y)
@@ -206,7 +189,13 @@ while not exit:  ##loops forever until user presses exit
     else:
         ran += 1    
     ###------------------------------------------------------
-        
+    ###old collision detection:
+    """if pygame.Rect.colliderect(paddle_left, ball) or pygame.Rect.colliderect(paddle_right, ball):
+        ##pygame.mixer.Sound.play(pong_sound)
+        ball_speed_x *= -1
+        print('paddle ball collision detected')
+        print(ball_speed_x)"""
+    ###----------------------------------------    
     if paddle_left.top <= 0: 
         paddle_left.top = 0
     if paddle_left.bottom >= window_height:
@@ -216,7 +205,19 @@ while not exit:  ##loops forever until user presses exit
         paddle_right.top = 0
     if paddle_right.bottom >= window_height:
         paddle_right.bottom = window_height
-    
+
+
+    if ball.left <= 0:
+        paddle_right_score += 1
+        print('paddle_right_score :')
+        print(paddle_right_score )
+        restart()
+
+    if ball.right >= window_width:
+        paddle_left_score += 1
+        print('paddle_left_score :')
+        print(paddle_left_score)
+        restart()
 
     if paddle_right_score >= 5 or paddle_left_score >= 5:
         
@@ -238,8 +239,8 @@ while not exit:  ##loops forever until user presses exit
     pygame.draw.ellipse(window, ballcolor, ball)
     ###pygame.display.flip()
 
-    paddle_left_score_letter = Font.render(str(paddle_left_score), False, red)
-    paddle_right_score_letter = Font.render(str(paddle_right_score), False, blue)   
+    paddle_left_score_letter = ScoreFont.render(str(paddle_left_score), False, red)
+    paddle_right_score_letter = ScoreFont.render(str(paddle_right_score), False, blue)   
 
     window.blit(paddle_left_score_letter, ((window_width / 2 - 5), 0))
     window.blit(paddle_right_score_letter, ((window_width /  2 + 25), 0))
